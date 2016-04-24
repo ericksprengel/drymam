@@ -1,6 +1,6 @@
 #!/usr/bin/env monkeyrunner
 # Imports the monkeyrunner modules used by this program
-from com.android.monkeyrunner import MonkeyRunner, MonkeyDevice, MonkeyImage
+from com.android.monkeyrunner import MonkeyRunner, MonkeyDevice
 import fling_util
 
 def get_min_max_in_block(block):
@@ -48,8 +48,8 @@ def get_min_max(image, dump=False):
   print("max: %s" % str(px_max))
 
 def is_empty_block(block):
-  pxf_min = [-1, 31, 53, 12]
-  pxf_max = [-1, 93, 129, 63]
+  pxf_min = [-1, 20, 35, 8]
+  pxf_max = [-1, 120, 159, 83]
 
   for x in range(10):
     for y in range(10):
@@ -61,9 +61,17 @@ def is_empty_block(block):
   return True
 
 
-def load_table(image):
+def get_empty_table():
+  table = []
+  for i in range(8):
+    table.append([])
+    for j in range(7):
+      table[i].append(None)
+  return table
+
+def load_table(image, dump=False):
   # getting a sub image from snapshot?
-  table = [[None]*7]*8
+  table = get_empty_table()
   for i in range(8):
     for j in range(7):
       x = j*102 + 0    + 102/4
@@ -71,6 +79,11 @@ def load_table(image):
       width  = 102/2
       height = 112/2
       block = image.getSubImage((x,y,width,height))
+
+      if dump: # dump blocks
+        fpath = 'res/block_%d_%d.png' % (i,j)
+        block.writeToFile(fpath, 'png')
+        print(fpath)
 
       if is_empty_block(block):
         table[i][j] = 0
@@ -85,10 +98,10 @@ def main():
   device = MonkeyRunner.waitForConnection()
 
   # Takes a screenshot
-  #result = device.takeSnapshot()
-  result = MonkeyImage.loadFromFile("imgs/lvl_01_00.png")
+  result = device.takeSnapshot()
+  #result = MonkeyRunner.loadImageFromFile("res/full.png")
 
-  fling_util.print_table(load_table(result))
+  fling_util.print_table(load_table(result, True))
 
 
 if __name__ == '__main__':
