@@ -13,6 +13,10 @@ class areas:
   OK_BUTTON_VICTORY = (( 570, 630),( 690, 690), "OK_BUTTON_VICTORY")
   OK_BUTTON_DEFENSE = (( 590, 630),( 690, 620), "OK_BUTTON_DEFENSE")
 
+  # first heroe x: 54.
+  # distance between heroes: 86
+  # x range: -10,+10
+  HEROES = [ (( 54 + 86*i - 10, 1045),( 54 + 86*i + 10, 1155)) for i in range(0,8) ]
 
 
 def save_screenshot(device, file_path):
@@ -29,7 +33,9 @@ def tap_on_area(device, area, sleep, debug=False):
       random.randint(area[0][1], area[1][1])
     )
   if debug:
-    save_screenshot(device, "%s_%s" % (datetime.datetime.now().strftime("%y-%m-%d_%H-%M-%f"), area[2]))
+    now = datetime.datetime.now()
+    # http://bugs.jython.org/issue2166
+    save_screenshot(device, "%s_%s_%s.png" % (now.strftime("%y-%m-%d_%H-%M"), now.microsecond, area[2]))
     print("click: %s, %s\t\t%s" % (tap[0], tap[1], area[2]) )
   device.touch(tap[0],tap[1],MonkeyDevice.DOWN_AND_UP)
   MonkeyRunner.sleep(sleep)
